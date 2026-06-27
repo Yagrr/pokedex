@@ -1,9 +1,15 @@
 import { z } from "zod";
 
+import { Cache } from "./pokecache.js";
+
 export class PokeAPI {
     private static readonly baseURL = "https://pokeapi.co/api/v2";
+    private static cache: Cache;
 
-    constructor() {}
+    constructor(interval: number) {
+        // 5 min = 300 000 ms
+        PokeAPI.cache = new Cache(interval);
+    }
 
     async fetchLocations(pageURL?: string): Promise<ShallowLocations> {
         if (!pageURL) {
@@ -11,28 +17,48 @@ export class PokeAPI {
             pageURL = `${PokeAPI.baseURL}/location-area/`;
         }
 
-        try {
-            const locations = await fetch (pageURL, {
-                method: "GET",
-                mode: "cors",
-            });
-            return ShallowLocationsSchema.parse(await locations.json());
-        } catch(error) {
-            throw new Error(`${error}`);
+        // Get cache if exists, check if valid
+        const cachedLocations = PokeAPI.cache.get(pageURL);
+        const isShallowLocations = (cachedData: unknown): cachedData is ShallowLocations => ShallowLocationsSchema.safeParse(cachedData).success;
+        if (isShallowLocations(cachedLocations)) {
+            return cachedLocations;
         }
+
+        const locationsFetched = await fetch (pageURL, {
+            method: "GET",
+
+            mode: "cors",
+        });
+        const locations = ShallowLocationsSchema.safeParse(await locationsFetched.json());
+        if (!locations.success) {
+            throw new Error(`${locations.error}`);
+        }
+
+        PokeAPI.cache.add(pageURL, locations.data);
+        return locations.data;
     }
 
     async fetchLocation(locationName: string): Promise<Location> {
         const pageURL = `${PokeAPI.baseURL}/location-area/${locationName}/`;
-        try {
-            const location = await fetch (pageURL, {
-                method: "GET",
-                mode: "cors",
-            });
-            return LocationSchema.parse(await location.json());
-        } catch(error) {
-            throw new Error(`${error}`);
+
+        // Get cache if exists, check if valid
+        const cachedLocation = PokeAPI.cache.get(pageURL);
+        const isLocation = (cachedData: unknown): cachedData is Location => LocationSchema.safeParse(cachedData).success;
+        if (isLocation(cachedLocation)) {
+            return cachedLocation;
         }
+
+        const locationFetched = await fetch (pageURL, {
+            method: "GET",
+            mode: "cors",
+        });
+        const location = LocationSchema.safeParse(await locationFetched.json());
+        if (!location.success) {
+            throw new Error(`Error fetching locations data - data: ${location.data}`);
+        }
+
+        PokeAPI.cache.add(pageURL, location.data);
+        return location.data;
     }
 }
 

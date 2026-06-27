@@ -20,7 +20,7 @@ export type State = {
     previousLocationsURL?: string | null;
 };
 
-export async function initState(prompt: string): Promise<State> {
+export async function initState(prompt: string, interval: number): Promise<State> {
     const state = {
         rl: createInterface({
             input: process.stdin,
@@ -28,7 +28,7 @@ export async function initState(prompt: string): Promise<State> {
             prompt: prompt.length > 0 ? `${prompt} ` : "",
         }),
         commands: getCommands(),
-        api: new PokeAPI(),
+        api: new PokeAPI(interval),
     }
     console.log("Welcome to the Pokedex!");
     state.rl.prompt();
@@ -37,11 +37,13 @@ export async function initState(prompt: string): Promise<State> {
         const inputSanitized = cleanInput(input)[0];
         if (inputSanitized in state.commands) {
             const commandCalled =state.commands[inputSanitized];
+
             try {
                 await commandCalled.callback(state);
             } catch(error) {
-                console.log(error);
+                console.error(error);
             }
+
         } else {
             console.log("Unknown command");
         }
