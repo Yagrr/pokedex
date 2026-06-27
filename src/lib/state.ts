@@ -33,21 +33,19 @@ export async function initState(prompt: string): Promise<State> {
     console.log("Welcome to the Pokedex!");
     state.rl.prompt();
 
-    state.rl.on("line", (input): void => {
+    state.rl.on("line", async (input): Promise<void> => {
         const inputSanitized = cleanInput(input)[0];
         if (inputSanitized in state.commands) {
-            const commandCalled = state.commands[inputSanitized];
+            const commandCalled =state.commands[inputSanitized];
             try {
-                commandCalled.callback(state);
-                state.rl.prompt()
+                await commandCalled.callback(state);
             } catch(error) {
                 console.log(error);
-                state.rl.prompt();
             }
         } else {
             console.log("Unknown command");
-            state.rl.prompt();
         }
+        state.rl.prompt();
     })
     state.rl.on("exit", commandExit);
 

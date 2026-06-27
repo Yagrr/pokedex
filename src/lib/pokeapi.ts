@@ -7,6 +7,7 @@ export class PokeAPI {
 
     async fetchLocations(pageURL?: string): Promise<ShallowLocations> {
         if (!pageURL) {
+            console.log(PokeAPI.baseURL);
             pageURL = `${PokeAPI.baseURL}/location-area/`;
         }
 
@@ -15,7 +16,7 @@ export class PokeAPI {
                 method: "GET",
                 mode: "cors",
             });
-            return locations.json();
+            return ShallowLocationsSchema.parse(await locations.json());
         } catch(error) {
             throw new Error(`${error}`);
         }
@@ -28,7 +29,7 @@ export class PokeAPI {
                 method: "GET",
                 mode: "cors",
             });
-            return location.json();
+            return LocationSchema.parse(await location.json());
         } catch(error) {
             throw new Error(`${error}`);
         }
@@ -40,8 +41,8 @@ export const ShallowLocationsSchema = z.object({
     next: z.nullable(z.string()),
     previous: z.nullable(z.string()),
     results: z.array(z.object({
-        name: z.string,
-        url: z.string,
+        name: z.string(),
+        url: z.string(),
     }))
 });
 
@@ -50,7 +51,11 @@ export const LocationSchema = z.object({
     location: z.object({
         name: z.string(),
         url: z.string(),
-    })
+    }),
+    pokemon_encounters: z.array(z.object({
+        name: z.string(),
+        url: z.string(),
+    })),
 });
 
 export type ShallowLocations = z.infer<typeof ShallowLocationsSchema>;
