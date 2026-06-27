@@ -1,7 +1,7 @@
 import { startREPL } from "./repl.js";
 
-function main() {
-    startREPL();
+async function main() {
+    await startREPL();
 }
 
 main();

@@ -1,6 +1,6 @@
 import { State } from "./state.js";
 
-export function commandHelp(state: State): void {
+export async function commandHelp(state: State): Promise<void> {
     console.log("\nUsage:\n");
     const commandsAvailable = state.commands;
     for (const cmd in commandsAvailable) {

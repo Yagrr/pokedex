@@ -1,8 +1,8 @@
 import { initState } from "./lib/state.js";
 
-export const startREPL = (): void => {
+export const startREPL = async (): Promise<void> => {
     const prompt = "Pokedex > ";
-    const state = initState(prompt)
+    const state = await initState(prompt);
 };
 
 export function cleanInput(input: string): string[] {
