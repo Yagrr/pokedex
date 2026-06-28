@@ -36,7 +36,7 @@ export async function initState(prompt: string, interval: number): Promise<State
     state.rl.on("line", async (input): Promise<void> => {
         const inputSanitized = cleanInput(input)[0];
         if (inputSanitized in state.commands) {
-            const commandCalled =state.commands[inputSanitized];
+            const commandCalled = state.commands[inputSanitized];
 
             try {
                 await commandCalled.callback(state);
@@ -45,7 +45,7 @@ export async function initState(prompt: string, interval: number): Promise<State
             }
 
         } else {
-            console.log("Unknown command");
+            console.error("Unknown command");
         }
         state.rl.prompt();
     })

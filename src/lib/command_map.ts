@@ -16,7 +16,7 @@ export async function commandMap(state: State): Promise<void> {
             console.log("You're on the first page.")
         }
     } catch(error) {
-        console.log(`Error while fetching map: ${error}`);
+        console.error(`Error while fetching map: ${error}`);
         state.rl.prompt();
     }
 } 
@@ -37,7 +37,7 @@ export async function commandMapb(state: State): Promise<void> {
             console.log("You're on the first page.");
         }
     } catch(error) {
-        console.log(`Error while fetching map: ${error}`);
+        console.error(`Error while fetching map: ${error}`);
         state.rl.prompt();
     }
 } 
