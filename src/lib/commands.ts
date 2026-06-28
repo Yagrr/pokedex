@@ -2,6 +2,7 @@ import { commandExit } from "./command_exit.js";
 import { commandHelp } from "./command_help.js";
 import { commandMap } from "./command_map.js";
 import { commandMapb } from "./command_map.js";
+import { commandExplore } from "./command_explore.js";
 
 import type { CLICommand } from "./state.js";
 
@@ -26,6 +27,11 @@ export function getCommands(): Record<string, CLICommand> {
             name: "mapb",
             description: "Display the previous 20 location areas in the Pokemon world",
             callback: commandMapb,
+        },
+        explore: {
+            name: "explore",
+            description: "Explore an area to list all the Pokemon in a given area, requires an area name as input",
+            callback: commandExplore,
         },
     };
 }

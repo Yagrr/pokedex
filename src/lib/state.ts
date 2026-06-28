@@ -9,7 +9,7 @@ import { PokeAPI } from "./pokeapi.js";
 export type CLICommand = {
     name: string;
     description: string;
-    callback: (state: State) => Promise<void>;
+    callback: (state: State, ...args: string[]) => Promise<void>;
 };
 
 export type State = {
@@ -34,12 +34,14 @@ export async function initState(prompt: string, interval: number): Promise<State
     state.rl.prompt();
 
     state.rl.on("line", async (input): Promise<void> => {
-        const inputSanitized = cleanInput(input)[0];
-        if (inputSanitized in state.commands) {
-            const commandCalled = state.commands[inputSanitized];
+        const inputSanitized = cleanInput(input);
+        const args = input.split(" ").slice(1);
+        // only take the first word as command
+        if (inputSanitized[0] in state.commands) {
+            const commandCalled = state.commands[inputSanitized[0]];
 
             try {
-                await commandCalled.callback(state);
+                await commandCalled.callback(state, ...args);
             } catch(error) {
                 console.error(error);
             }

@@ -13,8 +13,8 @@ export class PokeAPI {
 
     async fetchLocations(pageURL?: string): Promise<ShallowLocations> {
         if (!pageURL) {
-            console.log(PokeAPI.baseURL);
             pageURL = `${PokeAPI.baseURL}/location-area/`;
+            console.log(pageURL);
         }
 
         // Get cache if exists, check if valid
@@ -26,7 +26,6 @@ export class PokeAPI {
 
         const locationsFetched = await fetch (pageURL, {
             method: "GET",
-
             mode: "cors",
         });
         const locations = ShallowLocationsSchema.safeParse(await locationsFetched.json());
@@ -47,7 +46,6 @@ export class PokeAPI {
         if (isLocation(cachedLocation)) {
             return cachedLocation;
         }
-
         const locationFetched = await fetch (pageURL, {
             method: "GET",
             mode: "cors",
@@ -79,8 +77,12 @@ export const LocationSchema = z.object({
         url: z.string(),
     }),
     pokemon_encounters: z.array(z.object({
-        name: z.string(),
-        url: z.string(),
+        pokemon: z.object(
+            {
+                name: z.string(),
+                url: z.string(),
+            }
+        )
     })),
 });
 
