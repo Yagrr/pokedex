@@ -1,4 +1,4 @@
-import { State } from "./state.js";
+import { type State } from "./state.js";
 
 export async function commandExit(state: State): Promise<void> {
     console.log("\nClosing the Pokedex... Goodbye!\n");

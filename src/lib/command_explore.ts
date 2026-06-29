@@ -1,4 +1,4 @@
-import { State } from "./state.js";
+import { type State } from "./state.js";
 
 export async function commandExplore(state: State, ...locationNames: string[]): Promise<void> {
     // Omit state.rl.prompt at the end as this callback function runs in a
