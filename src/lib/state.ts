@@ -3,7 +3,7 @@ import { createInterface, type Interface } from "readline";
 import { getCommands } from "./commands.js";
 import { commandExit } from "./command_exit.js";
 import { cleanInput } from "../repl.js";
-import { PokeAPI } from "./pokeapi.js";
+import { PokeAPI, Pokemon } from "./pokeapi.js";
 
 
 export type CLICommand = {
@@ -18,6 +18,8 @@ export type State = {
     api: PokeAPI,
     nextLocationsURL?: string | null;
     previousLocationsURL?: string | null;
+    currentLocation?: string | null;
+    pokedex: Record<string, Pokemon>,
 };
 
 export async function initState(prompt: string, interval: number): Promise<State> {
@@ -29,6 +31,7 @@ export async function initState(prompt: string, interval: number): Promise<State
         }),
         commands: getCommands(),
         api: new PokeAPI(interval),
+        pokedex: {},
     }
     console.log("Welcome to the Pokedex!");
     state.rl.prompt();
@@ -52,6 +55,5 @@ export async function initState(prompt: string, interval: number): Promise<State
         state.rl.prompt();
     })
     state.rl.on("exit", commandExit);
-
     return state;
 }

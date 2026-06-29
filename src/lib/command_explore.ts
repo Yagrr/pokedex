@@ -5,7 +5,7 @@ export async function commandExplore(state: State, ...locationNames: string[]): 
     // loop to parse multiple locationName
     if (locationNames.length === 0) {
         console.log(`Empty location name, please input an area name`);
-        state.rl.prompt();
+        return;
     }
     for (const locationName of locationNames) {
         console.log(`Exploring ${locationName}...`);
@@ -15,6 +15,8 @@ export async function commandExplore(state: State, ...locationNames: string[]): 
             for (const pokemonData of pokemonEncounters) {
                 console.log(`- ${pokemonData.pokemon.name}`);
             }
+            // successfully explored, set locationName as latest explored
+            state.currentLocation = locationName;
         } catch(error) {
             console.error(`Error while exploring: ${error}`);
             continue;

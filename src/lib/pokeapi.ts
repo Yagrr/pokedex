@@ -58,6 +58,28 @@ export class PokeAPI {
         PokeAPI.cache.add(pageURL, location.data);
         return location.data;
     }
+
+    async fetchPokemonInfo(pokemonName: string): Promise<Pokemon> {
+        const pageURL = `${PokeAPI.baseURL}/pokemon/${pokemonName}`;
+
+        // Get cache if exists, check if valid
+        const cachedPokemonData = PokeAPI.cache.get(pageURL);
+        const isPokemonData = (cachedData: unknown): cachedData is Pokemon => PokemonSchema.safeParse(cachedData).success;
+        if (isPokemonData(cachedPokemonData)) {
+            return cachedPokemonData;
+        }
+        const pokemonDataFetched = await fetch (pageURL, {
+            method: "GET",
+            mode: "cors",
+        });
+        const pokemon = PokemonSchema.safeParse(await pokemonDataFetched.json());
+        if (!pokemon.success) {
+            throw new Error(`Error fetching locations data - data: ${pokemon.data}`);
+        }
+
+        PokeAPI.cache.add(pageURL, pokemon.data);
+        return pokemon.data;
+    }
 }
 
 export const ShallowLocationsSchema = z.object({
@@ -86,6 +108,25 @@ export const LocationSchema = z.object({
     })),
 });
 
-export type ShallowLocations = z.infer<typeof ShallowLocationsSchema>;
+export const PokemonSchema = z.object({
+    name: z.string(),
+    base_experience: z.number(),
+    types: z.array(z.object({
+        slot: z.number(),
+        type: z.object({
+            name: z.string(),
+        }),
+    })),
+    height: z.number(),
+    weight: z.number(),
+    stats: z.array(z.object({
+        stat: z.object({
+            name: z.string()
+        }),
+        base_stat: z.number(),
+    })),
+});
 
+export type ShallowLocations = z.infer<typeof ShallowLocationsSchema>;
 export type Location = z.infer<typeof LocationSchema> ;
+export type Pokemon = z.infer<typeof PokemonSchema>;
